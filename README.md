@@ -15,7 +15,8 @@ g++ -c GaKCo.cpp -o GaKCo -fopenmp
 ```
 To get kernel output: 
 ```
-#GaKCo <sequencefile> <dictionaryfile> <filename  for labels> <g> <k> <filename for kernel> <set for multithread>   
+GaKCo <sequencefile> <dictionaryfile> <filename  for labels> <g> <k> <filename for kernel> <set for multithread>   
+#User options: <g> > 5, <k> =(0,..,g-1), <set for multithread> = 0 for single-thread/ 1 for multithread
 ```
 Bash script to run end-to-end kernel calculation:
 ```
