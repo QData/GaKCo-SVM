@@ -7,7 +7,7 @@ GaKCo is a a fast and naturally parallelizable algorithm for gapped k-mer based 
 **Datasets for GaKCo:** 
 We perform 19 different classification tasks to evaluate the performance of GaKCo. These tasks belong to the discussed three categories: (1) TF binding site prediction (DNA dataset), (2) Remote Protein Homology prediction (protein dataset), and (3) Character-based English text classification (text dataset).
 
-The train and test sets have been provided in "data/" folder.
+The train and test sets have been provided in "data.zip" folder.
 
 Compiling GaKCo (with openMP) : 
 ```
