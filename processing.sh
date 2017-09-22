@@ -19,7 +19,7 @@ cat labels.txt|cut -d' ' -f1|head -$ntrain > train.labels.txt
 cat labels.txt|cut -d' ' -f1|tail -n $ntest > test.labels.txt
 
 
-#create empirical feature map (liblinear format : label foloowed by features)
+#create empirical feature map (liblinear format : label followed by features)
 paste -d" " train.labels.txt kernel_train.txt>train.features.txt
 paste -d" " test.labels.txt kernel_test.txt>test.features.txt
  #C parameter for liblinear
