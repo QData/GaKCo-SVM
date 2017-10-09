@@ -39,7 +39,7 @@ multithreading
             multithreading: 1 to enable multithreading, 0 to disable it
 Example:
 ```
-    $ ./GaKCo sequences.fasta /data/protein.dictionary.txt /results/proteinLabels.txt 7 5 /results/proteinKernel 1
+    $ ./GaKCo sequences.fasta /data/protein.dictionary.txt proteinLabels.txt 7 5 proteinKernel.txt 1
 ```
 This will use the input files to compute a kernel matrix that can be inputted to an SVM classifier.            
 
