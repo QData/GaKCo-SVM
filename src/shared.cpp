@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstdlib>
-#include <malloc.h>
 #include <string.h>
 #include <fstream>
 #include <thread>
