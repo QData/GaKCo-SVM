@@ -61,4 +61,36 @@ This option uses default hard-coded file names. You can change these default val
 #### Results
 Results (including the computed `kernel.txt` file are placed in your `GaKCo-SVM/results` directory.
 
+## Trouble Shooting
+### For Mac Users
+Compiling GaKCo requires the OpenMP library, which is not always included with clang (we compile with g++, which usually references clang on Macs). To successfully install GaKCo it may be necessary to do the following:
+First check if your machine has Homebrew installed:
+```
+    $ brew --version
+```
+If it does not return a version of Homebrew, enter:
+```
+    $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+```
+Once you have verified that Homebrew has been installed, enter:
+```
+    $ brew install gcc
+```
+This will create a second GCC installation (that includes OpenMP) located in your /usr/local/bin directory. Open `Makefile` in `GaKCo/src` and edit the CXX line (line 4) to say the following:
+```
+CXX = g++-7
+```
+That is, just add "-7" after "g++".
+Now save the change and enter:
+```
+    $ make clean
+    $ make all install
+```
+An executable named "GaKCo" should now be located in your GaKCo/bin directory.
+
+Finally, it may be necessary to install the Command Line Tools package (e.g., if you get an error saying something like "stdio.h not found"):
+```
+    $ xcode-select --install
+```
+
 
