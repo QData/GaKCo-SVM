@@ -15,7 +15,7 @@ Download and extract this repository, then enter:
     $ cd src
     $ make all install
 ```
-An executable file named `GaKCo` should now be located in your `GaKCo-SVM/bin` directory. If this is not the case, please refer to the [troubleshooting section of our Wiki](https://github.com/QData/GaKCo-SVM/wiki/Troubleshooting).
+An executable file named `GaKCo` should now be located in your `GaKCo-SVM/bin` directory. If this is not the case, please refer to the trouble shooting section below. 
 ## Tutorial
 ### Running GaKCo
 GaKCo takes seven arguments:
