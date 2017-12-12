@@ -47,7 +47,7 @@ You can run GaKCo using the `RUN.sh` script:
 Where the training and testing files are FASTA files.
 Example:
 ```
-    $ bash RUN.sh data/1.1.test.train.fasta data/1.1.train.fasta data/protein.dictionary.txt
+    $ bash RUN.sh data/1.1.test.fasta data/1.1.train.fasta data/protein.dictionary.txt
 ```
 Alternatively, you can simply use:
 ```
