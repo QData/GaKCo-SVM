@@ -18,14 +18,7 @@ Download and extract this repository, then enter:
 An executable file named `GaKCo` should now be located in your `GaKCo-SVM/bin` directory. If this is not the case, please refer to the trouble shooting section below. 
 ## Tutorial
 ### Running GaKCo
-GaKCo takes seven arguments:
-sequence file (fasta)
-dictionary file
-labels file
-g
-k
-kernel file name
-multithreading
+GaKCo takes seven arguments: sequence file (fasta), dictionary file, labels file, g, k, kernel file name, multithreading
 
         Usage: ./GaKCo <sequenceFile> <dictionaryFile> <labelsFile> <g> <k> <kernelFile> <multithreadingEnabled>
         
@@ -39,9 +32,12 @@ multithreading
             multithreading: 1 to enable multithreading, 0 to disable it
 Example:
 ```
-    $ ./GaKCo sequences.fasta /data/protein.dictionary.txt proteinLabels.txt 7 5 proteinKernel.txt 1
+    $ ./GaKCo sequences.fasta data/protein.dictionary.txt proteinLabels.txt 7 5 proteinKernel.txt 1
 ```
 This will use the input files to compute a kernel matrix that can be inputted to an SVM classifier.            
+
+#### Limits
+GaKCo can currently process up to 50,000 sequences.
 
 ### Running GaKCo with the RUN.sh script
 You can run GaKCo using the `RUN.sh` script:
@@ -51,13 +47,14 @@ You can run GaKCo using the `RUN.sh` script:
 Where the training and testing files are FASTA files.
 Example:
 ```
-    $ bash RUN.sh /data/1.1.test.train.fasta /data/1.1.train.fasta /data/protein.dictionary.txt
+    $ bash RUN.sh data/1.1.test.train.fasta data/1.1.train.fasta data/protein.dictionary.txt
 ```
 Alternatively, you can simply use:
 ```
     $ bash RUN.sh
 ```
 This option uses default hard-coded file names. You can change these default values by opening RUN.sh and changing the file names (located on lines 8, 9, 10)
+
 #### Results
 Results (including the computed `kernel.txt` file are placed in your `GaKCo-SVM/results` directory.
 
