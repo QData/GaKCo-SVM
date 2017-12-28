@@ -17,10 +17,8 @@
 #include <random>
 
 #define STRMAXLEN 15000
-#define MAXNSTR 50000
+
 char *trimwhitespace(char *s);
-
-
 
 char *trimwhitespace(char *str)
 {
