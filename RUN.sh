@@ -27,11 +27,13 @@ cat $train_file $test_file > ./results/sequences.fasta
 echo "Feeding data into GaKCo..."
 
 # feed into GaKCo 
-#GaKCo <sequencefile> <dictionaryfile> <filename  for labels> <g> <k> <filename for kernel> <set for multithread>   
+#GaKCo -g <int> -k <int> -n <int> -p <int> <sequencefile> <dictionaryfile> <filename  for labels> <g> <k> <filename for kernel> <set for multithread>   
 # g,k (user's choice)
 g=7
 k=5
-./bin/GaKCo ./results/sequences.fasta $dict_file ./results/labels.txt $g $k ./results/kernel.txt 1
+p=1
+n=15000
+./bin/GaKCo -g $g -k $k -n $n -p $p ./results/sequences.fasta $dict_file ./results/labels.txt ./results/kernel.txt
 
 echo "Kernel matrix computed and stored in results/kernel.txt..."
 

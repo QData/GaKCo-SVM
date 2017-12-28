@@ -85,7 +85,7 @@ int help()
 	printf("\nUsage: gakco [options] <sequenceFile> <dictionaryFile> <labelsFile> <kernelFile>\n");
 	printf("\t g : length of gapped instance. Constraints: 0 < g < 20. Default: 7\n");
 	printf("\t k : length of k-mer. Constraints: k < g. Default: 5\n");
-	printf("\t n : maximum number of training examples in the data set. Default: 15000\n");
+	printf("\t n : maximum number of examples in the data set. Default: 15000\n");
 	printf("\t p : parallel. Set to 1 to using multithreading; else set to 0. Default: 1\n");
 	printf("\t sequenceFile : set of training and testing examples in FASTA format\n");
 	printf("\t dictionaryFile : file containing the alphabet of characters that appear in the sequences (simple text file)\n");
@@ -95,7 +95,7 @@ int help()
 	printf("\t IMPORTANT: \n");
 	printf("\t\t sequence elements must be in the range [0,AlphabetSize - 1].\n");
 	printf("\t\t g - k should be less than 20\n");
-	printf("\nExample usage: ./trainKernel -g 7 -k 5 -n 15000 -p 1 myProteinFile.fasta myProteinDictionary.txt theOutputFile theKernelFile\n\n");
+	printf("\nExample usage: ./GaKCo -g 7 -k 5 -n 15000 -p 1 myProteinFile.fasta myProteinDictionary.txt theOutputFile theKernelFile\n\n");
 
 	return 1;
 }
