@@ -29,8 +29,8 @@ GaKCo takes several arguments:
             p : (optional) parallel. Set to 1 to using multithreading; else set to 0. Default: 1
             sequenceFile : set of training and testing examples in FASTA format
             dictionaryFile : file containing the alphabet of characters that appear in the sequences (simple text file)
-            labelsFile : (required) file to place labels from the examples (simple text file)
-            kernelFile : (required) name of the file to write the kernel that will be computed by GaKCo
+            labelsFile : file to place labels from the examples (simple text file)
+            kernelFile : name of the file to write the kernel that will be computed by GaKCo
 For example:
 ```
     $ ./GaKCo -g 7 -k 5 -n 15000 -p 1 mySequences.fasta data/protein.dictionary.txt labelsFile.txt computedKernel.txt
