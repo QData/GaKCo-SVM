@@ -17,26 +17,28 @@
 #include <random>
 
 #define STRMAXLEN 15000
-#define MAXNSTR 50000
+
 char *trimwhitespace(char *s);
-
-
 
 char *trimwhitespace(char *str)
 {
 	char *end;
 
 	/* Trim leading space*/
-	while (isspace(*str)) str++;
+	while (isspace(*str)) {
+		str++;
+	}
 
-	if (*str == 0)
+	if (*str == 0) {
 		return str;
+	}
 
 	/* Trim trailing space*/
 	end = str + strlen(str) - 1;
 
-	while (end > str && isspace(*end)) end--;
-
+	while (end > str && isspace(*end)) {
+		end--;
+	}
 	
 	*(end + 1) = 0;
 
@@ -46,47 +48,38 @@ char *trimwhitespace(char *str)
 // count and sort
 void cntsrtna(unsigned int *out,unsigned int *sx, int k, int r, int na)
 {
-
 	int *sxc = (int *)malloc(na*sizeof(int));
 	int *bc1 = (int *)malloc(na*sizeof(int));
 	int *sxl = (int *)malloc(r*sizeof( int));
 	int *cc = (int *)malloc(r*sizeof(int));
 	
+	for (int i = 0; i < r; ++i) {
+		out[i] = i;
+	}
 
-		for (int i = 0; i < r; ++i)
-			out[i] = i;
-		for (int j = k - 1; j >= 0; --j)
-		{
-			for (int i = 0; i < na; ++i)
-				sxc[i] = 0;
-			for (int i = 0; i < r; ++i)
-			{
-				cc[i] = sx[out[i] + j*r];
-				
-				sxc[cc[i]]++;
-			}
-
-			bc1[0] = 0;
-			for (int i = 1; i < na; ++i)
-				bc1[i] = bc1[i - 1] + sxc[i - 1];
-			for (int i = 0; i < r; ++i)
-			{
-			
-
-				sxl[bc1[cc[i]]++] = out[i];
-			}
-			for (int i=0; i < r;++i)
-			{
-				out[i] = sxl[i];
-				}
-
-
+	for (int j = k - 1; j >= 0; --j) {
+		for (int i = 0; i < na; ++i)
+			sxc[i] = 0;
+		for (int i = 0; i < r; ++i) {
+			cc[i] = sx[out[i] + j*r];
+			sxc[cc[i]]++;
 		}
 
-free(sxl);
-free(sxc);
-free(cc);
-free(bc1);
+		bc1[0] = 0;
+		for (int i = 1; i < na; ++i)
+			bc1[i] = bc1[i - 1] + sxc[i - 1];
+		for (int i = 0; i < r; ++i) {
+			sxl[bc1[cc[i]]++] = out[i];
+		}
+		for (int i=0; i < r;++i) {
+			out[i] = sxl[i];
+		}
+	}
+
+	free(sxl);
+	free(sxc);
+	free(cc);
+	free(bc1);
 }
 
 //update cumulative mismatch profile
@@ -198,28 +191,18 @@ double nchoosek(double n, double k)
 	return prod;
 }
 
-void getCombinations( int *elems,unsigned int n, unsigned int k, int *pos, unsigned int depth, unsigned int margin, unsigned int* cnt_comb, unsigned int *out, int num_comb)
-{
-
-
-		if (depth >= k)
-		{
-				for ( int j = 0; j < k; ++j)
-				{
-					out[cnt_comb[0] + j*num_comb] = pos[j];
-				}
-				cnt_comb[0]++;
-				return;
+void getCombinations( int *elems,unsigned int n, unsigned int k, int *pos, unsigned int depth, unsigned int margin, unsigned int* cnt_comb, unsigned int *out, int num_comb) {
+	if (depth >= k) {
+		for ( int j = 0; j < k; ++j) {
+			out[cnt_comb[0] + j*num_comb] = pos[j];
 		}
-
-
-			for ( int j = margin; j < n; ++j)
-			{
-				pos[depth] = j;
-				getCombinations(elems,n, k, pos, depth + 1, j + 1, cnt_comb, out, num_comb);
-			}
-
-
+		cnt_comb[0]++;
+		return;
+	}
+	for ( int j = margin; j < n; ++j) {
+		pos[depth] = j;
+		getCombinations(elems,n, k, pos, depth + 1, j + 1, cnt_comb, out, num_comb);
+	}
 }
 
 
