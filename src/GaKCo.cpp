@@ -83,10 +83,10 @@ Features *extractFeatures(int **S, int *len, int nStr, int g)
 int help()
 {
 	printf("\nUsage: gakco [options] <sequenceFile> <dictionaryFile> <labelsFile> <kernelFile>\n");
-	printf("\t g : length of gapped instance. Constraints: 0 < g < 20. Default: 7\n");
-	printf("\t k : length of k-mer. Constraints: k < g. Default: 5\n");
-	printf("\t n : maximum number of examples in the data set. Default: 15000\n");
-	printf("\t p : parallel. Set to 1 to using multithreading; else set to 0. Default: 1\n");
+	printf("\t g : length of gapped instance. Constraints: 0 < g < 20\n");
+	printf("\t k : length of k-mer. Constraints: k < g\n");
+	printf("\t n : (optional) maximum number of examples in the data set. Default: 15000\n");
+	printf("\t p : (optional) parallel. Set to 1 to using multithreading; else set to 0. Default: 1\n");
 	printf("\t sequenceFile : set of training and testing examples in FASTA format\n");
 	printf("\t dictionaryFile : file containing the alphabet of characters that appear in the sequences (simple text file)\n");
 	printf("\t labelsFile : file to place labels from the examples (simple text file)\n");
@@ -95,7 +95,7 @@ int help()
 	printf("\t IMPORTANT: \n");
 	printf("\t\t sequence elements must be in the range [0,AlphabetSize - 1].\n");
 	printf("\t\t g - k should be less than 20\n");
-	printf("\nExample usage: ./GaKCo -g 7 -k 5 -n 15000 -p 1 myProteinFile.fasta myProteinDictionary.txt theOutputFile theKernelFile\n\n");
+	printf("\nExample usage: ./GaKCo -g 7 -k 5 -n 15000 -p 1 myProteinFile.fasta myProteinDictionary.txt labelOutputFile.txt kernelOutputFile.txt\n\n");
 
 	return 1;
 }
@@ -184,8 +184,10 @@ void main_loop_kernel(int * elems,Features * features ,unsigned int *Ksfinal,int
 int main(int argc, char *argv[]) {
 
 	//Get the g, k, nStr, and parallel_ values from the command line 
-	int g, k, parallel_;
-	long int max_num_str = 15000; //Default value is 15000
+	int g = -1;
+	int k = -1;
+	int parallel_ = 1; //use multithreading by default
+	long int max_num_str = 15000; //Use max string length of 15000 by default
 
 	int c;
 	while ((c = getopt(argc, argv, "g:k:n:p:")) != -1) {
@@ -201,8 +203,19 @@ int main(int argc, char *argv[]) {
 				break;
 			case 'p':
 				parallel_ = atoi(optarg);
+				if (parallel_ != 0 && parallel_ != 1) {
+					return help();
+				}
 				break;
 		}
+	}
+	if (g == -1) {
+		printf("Must provide a value for the g parameter\n");
+		return help();
+	}
+	if (k == -1) {
+		printf("Must provide a value for the k parameter\n");
+		return help();
 	}
 
 	int argNum = optind;

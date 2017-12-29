@@ -23,12 +23,12 @@ GaKCo takes several arguments:
         Usage: ./GaKCo -g <int> -k <int> -n <int> -p <int> <sequenceFile> <dictionaryFile> <labelsFile> <kernelFile>
         
         Arguments:
-            g : (required) length of gapped instance. Constraints: 0 < g < 20. Default: 7
-            k : (required) length of k-mer. Constraints: k < g. Default: 5
+            g : length of gapped instance. Constraints: 0 < g < 20
+            k : length of k-mer. Constraints: k < g
             n : (optional) maximum number of examples in the data set. Default: 15000
             p : (optional) parallel. Set to 1 to using multithreading; else set to 0. Default: 1
-            sequenceFile : (required) set of training and testing examples in FASTA format
-            dictionaryFile : (required) file containing the alphabet of characters that appear in the sequences (simple text file)
+            sequenceFile : set of training and testing examples in FASTA format
+            dictionaryFile : file containing the alphabet of characters that appear in the sequences (simple text file)
             labelsFile : (required) file to place labels from the examples (simple text file)
             kernelFile : (required) name of the file to write the kernel that will be computed by GaKCo
 For example:
@@ -40,18 +40,17 @@ This would use the input files to compute a kernel matrix (stored in computedKer
 ### Running GaKCo with the RUN.sh script
 You can run GaKCo using the `RUN.sh` script:
 ```
-    $ bash RUN.sh <trainingFile> <testingFile> <dictionaryFile>
+    $ bash RUN.sh <trainingFile.fasta> <testingFile.fasta> <dictionaryFile.txt>
 ```
-Where the training and testing files are FASTA files.
 Example:
 ```
     $ bash RUN.sh data/1.1.test.fasta data/1.1.train.fasta data/protein.dictionary.txt
 ```
-Alternatively, you can simply use:
+Alternatively, you can simply use the following to call the RUN.sh script with default hard-coded values:
 ```
     $ bash RUN.sh
 ```
-This option uses default hard-coded file names. You can change these default values by opening RUN.sh and changing the file names (located on lines 8, 9, 10). You can change the default parameter values by modifying lines 32-35.
+You can change the default values by opening RUN.sh and changing the file names (located on lines 8, 9, 10). You can change the default parameter values by modifying lines 32-35.
 
 #### Results
 Results (including the computed `kernel.txt` file are placed in your `GaKCo-SVM/results` directory.
