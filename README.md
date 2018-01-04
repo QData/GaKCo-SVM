@@ -68,7 +68,11 @@ If it does not return a version of Homebrew, enter:
 ```
     $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 ```
-Once you have verified that Homebrew has been installed, enter:
+If it your machine is running an older version, enter:
+```
+    $ brew update
+```
+Once you have verified that Homebrew has been installed or is updated to the latest version, enter:
 ```
     $ brew install gcc
 ```
