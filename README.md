@@ -25,7 +25,7 @@ GaKCo takes several arguments:
         Arguments:
             g : length of gapped instance. Constraints: 0 < g < 20
             k : length of k-mer. Constraints: k < g
-            n : (optional) maximum number of examples in the data set. Default: 15000 [This value can be increased or decreased according                  to the memory capacity of the machine]
+            n : (optional) maximum number of examples in the data set. Default: 15000 [This value can be increased or decreased according to the memory capacity of the machine]
             p : (optional) parallel. Set to 1 to using multithreading; else set to 0. Default: 1
             sequenceFile : set of training and testing examples in FASTA format
             dictionaryFile : file containing the alphabet of characters that appear in the sequences (simple text file)
