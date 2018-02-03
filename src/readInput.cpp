@@ -8,24 +8,20 @@
 #include <string.h>
 #include <omp.h>
 
-
 int * string_replace (char *s, char *d);
 int help2();
 char * readDict (char *filename, int *na);
 int dictsize;
 
-//read input from fasta file
 
-int ** Readinput_(char *filename, char *dictfile, int *seqLabels, int *seqLengths, long int *nStr, long int *maxlen, long int *minlen, int *dictionarySize, int max_num_str) {
+int ** Readinput_(char *filename, char *dictFileName, int *seqLabels, int *seqLengths, long int *nStr, long int *maxlen, long int *minlen, int *dictionarySize, int maxNumStr) {
     int **output;
     char *labelfile, *seqfile;
     char *str, *linetemp, *line, *seq, *trimline, *label;
-    int j;
     bool isLabel = true;
     FILE *inpfile;
     char *d;
-    int c = 0;
-    d = readDict(dictfile, dictionarySize);
+    d = readDict(dictFileName, dictionarySize);
 
     printf("Reading %s\n", filename);
     inpfile = fopen(filename, "r");
@@ -33,7 +29,7 @@ int ** Readinput_(char *filename, char *dictfile, int *seqLabels, int *seqLength
     if (inpfile) {
         line = (char *) malloc(STRMAXLEN * sizeof(char));
         int row = 0; //counts rows of the output and line number of the sequence file
-        output =  (int **) malloc(STRMAXLEN * sizeof(int *));
+        output =  (int **) malloc(maxNumStr * sizeof(int *));
 
         while (fgets(line, STRMAXLEN, inpfile)) {
             linetemp = (char *) malloc(STRMAXLEN * sizeof(char *));
@@ -71,7 +67,7 @@ int ** Readinput_(char *filename, char *dictfile, int *seqLabels, int *seqLength
     } else {
         perror(filename);
     }
-    
+
     for (int kk = 0; kk < *nStr; kk++) {
         for(int jj = 0; jj < seqLengths[kk]; jj++) {
             if(output[kk][jj] > dictsize) {
@@ -84,13 +80,13 @@ int ** Readinput_(char *filename, char *dictfile, int *seqLabels, int *seqLength
 
 // read dictionary to convert into numerical format
 
-char * readDict (char *filename, int *dictionarySize) {
+char * readDict (char *dictFileName, int *dictionarySize) {
     char *D;
     char *linetemp1, *line1, *next_elem, *trimline;
     int i, j;
     FILE *inpfile;
 
-    inpfile = fopen (filename, "r" );
+    inpfile = fopen (dictFileName, "r" );
     D = (char *) malloc(50 * sizeof(char));
 
     if (inpfile) {
@@ -109,7 +105,7 @@ char * readDict (char *filename, int *dictionarySize) {
         fclose(inpfile);
         *dictionarySize = dictsize + 2;
     } else {
-        perror(filename);
+        perror(dictFileName);
     }
     return D;
 }
