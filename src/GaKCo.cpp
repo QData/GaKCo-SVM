@@ -231,7 +231,7 @@ int main(int argc, char *argv[]) {
 	strcpy(filename_label, argv[argNum++]);
 	strcpy(opfilename, argv[argNum]);
 
-	int *label;
+	int *seqLabels;
 	int num_max_mismatches, dictionarySize;
 	unsigned int addr;
 	long int num_comb, value;
@@ -251,7 +251,7 @@ int main(int argc, char *argv[]) {
 	
 	isVerbose = 0;
 	
-	label = (int *) malloc(max_num_str * sizeof(int));
+	seqLabels = (int *) malloc(max_num_str * sizeof(int));
 	seqLengths = (int *) malloc(max_num_str * sizeof(int));
 	assert(seqLengths != 0);  
 	maxlen = 0;
@@ -261,7 +261,7 @@ int main(int argc, char *argv[]) {
 	//Read the sequence file
 	
 	printf("Input file : %s\n", filename);
-	S = Readinput_(filename, Dicfilename, label, seqLengths, &nStr, &maxlen, &minlen, &dictionarySize, max_num_str);
+	S = Readinput_(filename, Dicfilename, seqLabels, seqLengths, &nStr, &maxlen, &minlen, &dictionarySize, max_num_str);
 	
 	if (k <= 0 || g <= k || g > 20 || g - k > 20 || dictionarySize <= 0) {
 		return help();
@@ -369,7 +369,7 @@ int main(int argc, char *argv[]) {
 		for (int j = 0; j < nStr; ++j) {
 			fprintf(kernelfile, "%d:%e ", j + 1, K[i + j*nStr] / sqrt(K[i + i*nStr] * K[j + j*nStr]));
 		}
-		fprintf(labelfile, "%d ", label[i]);
+		fprintf(labelfile, "%d ", seqLabels[i]);
 		fprintf(labelfile, "\n");
 		fprintf(kernelfile, "\n");
 	}
@@ -378,7 +378,7 @@ int main(int argc, char *argv[]) {
 	fclose(labelfile);
 	free(cnt_k);
 	free(Ksfinal);
-	free(label);
+	free(seqLabels);
 	free(K);
 	free(nchoosekmat);
 	free(feat);
