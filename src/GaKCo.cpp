@@ -108,7 +108,7 @@ int errorID1()
 
 // Build cumulative mismatch profile for each M
 
-void main_loop_kernel(int * elems,Features * features ,unsigned int *Ksfinal,int * cnt_k,   int *feat,int g, int k, int na,int nfeat,int nStr,int i)
+void main_loop_kernel(int * elems,Features * features ,unsigned int *Ksfinal,int * cnt_k,   int *feat,int g, int k, int dictionarySize, int nfeat,int nStr,int i)
 {
 	unsigned long int c = 0;
 	int num_comb;
@@ -145,7 +145,7 @@ void main_loop_kernel(int * elems,Features * features ,unsigned int *Ksfinal,int
 			}
 		}
 		//sort the g-mers
-		cntsrtna(sortIdx,feat1, g - i, nfeat, na);    
+		cntsrtna(sortIdx,feat1, g - i, nfeat, dictionarySize);    
 
 		for ( int j1 = 0; j1 < nfeat; ++j1) {
 			for ( int j2 = 0; j2 < g - i; ++j2) {
@@ -232,13 +232,13 @@ int main(int argc, char *argv[]) {
 	strcpy(opfilename, argv[argNum]);
 
 	int *label;
-	int num_max_mismatches, na;
+	int num_max_mismatches, dictionarySize;
 	unsigned int addr;
 	long int num_comb, value;
 	int nfeat;
 	double *K;
 	unsigned int *nchoosekmat, *Ks, *Ksfinal, *Ksfinalmat;
-	int *len;
+	int *seqLengths;
 	int **S;
 	unsigned int *sortIdx;
 	int *feat;
@@ -251,19 +251,19 @@ int main(int argc, char *argv[]) {
 	
 	isVerbose = 0;
 	
-	label = (int *)malloc(STRMAXLEN*sizeof(int));
-	len = (int *)malloc(STRMAXLEN * sizeof(int));
-	assert(len != 0);  
+	label = (int *) malloc(max_num_str * sizeof(int));
+	seqLengths = (int *) malloc(max_num_str * sizeof(int));
+	assert(seqLengths != 0);  
 	maxlen = 0;
-	minlen = max_num_str;
+	minlen = STRMAXLEN;
 	long int nStr = max_num_str;
 	
 	//Read the sequence file
 	
 	printf("Input file : %s\n", filename);
-	S = Readinput_(filename, Dicfilename, label, len, &nStr, &maxlen, &minlen, &na, max_num_str);
+	S = Readinput_(filename, Dicfilename, label, seqLengths, &nStr, &maxlen, &minlen, &dictionarySize, max_num_str);
 	
-	if (k <= 0 || g <= k || g > 20 || g - k > 20 || na <= 0) {
+	if (k <= 0 || g <= k || g > 20 || g - k > 20 || dictionarySize <= 0) {
 		return help();
 	}
 	if (maxlen != minlen) {
@@ -287,7 +287,7 @@ int main(int argc, char *argv[]) {
 	printf("\n");
 
 	/*Extract g-mers.*/
-	features = extractFeatures(S, len, nStr, g);
+	features = extractFeatures(S, seqLengths, nStr, g);
 	
 	nfeat = (*features).n;
 	feat = (*features).features;
@@ -312,9 +312,9 @@ int main(int argc, char *argv[]) {
 	std::vector<std::thread> th;
 	for ( int i = 0 ; i <= g-k; i++) {
 		if(parallel_) {
-			th.push_back(std::thread(&main_loop_kernel,elems,features ,Ksfinal,cnt_k,feat,g, k, na,nfeat,nStr,i));
+			th.push_back(std::thread(&main_loop_kernel,elems,features ,Ksfinal,cnt_k,feat,g, k, dictionarySize, nfeat,nStr,i));
 		} else {
-			main_loop_kernel(elems,features ,Ksfinal,cnt_k,feat,g, k, na,nfeat,nStr,i);
+			main_loop_kernel(elems,features, Ksfinal, cnt_k, feat, g, k, dictionarySize, nfeat, nStr, i);
 		}
 	}
 	
