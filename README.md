@@ -39,10 +39,11 @@ Or:
 ```
     $ ./bin/GaKCo -g 7 -k 5 -n 15000 -p 1 mySequences.fasta data/protein.dictionary.txt labelsFile.txt computedKernel.txt
 ```
-This would use the input files to compute a kernel matrix (stored in computedKernel.txt) that can be inputted to an SVM classifier.
+## Output
+GaKCo computes the kernel function for all pairs of sequences in the provided sequence file, thus giving the "distance" or "similarity" values needed for an SVM classifier. The file will be found in your `GaKCo` directory.
 
 ### Running GaKCo with the RUN.sh script
-You can run GaKCo using the `RUN.sh` script after completing the "Installation" instructions above:
+You can run GaKCo using the `RUN.sh` script after completing the "Installation" instructions above. This option is useful if you have separate training and testing files and want to create a training set kernel file and a testing set kernel file.
 ```
     $ bash RUN.sh <trainingFile.fasta> <testingFile.fasta> <dictionaryFile.txt>
 ```
@@ -56,8 +57,8 @@ Alternatively, you can simply use the following to call the RUN.sh script with d
 ```
 You can change the default values by opening RUN.sh and changing the file names (located on lines 8, 9, 10). You can change the default parameter values by modifying lines 32-35.
 
-#### Results
-Results (including the computed `kernel.txt` file are placed in your `GaKCo-SVM/results` directory.
+## Output
+The script places the computed test and kernel files in the `GaKCo-SVM/results` directory.
 
 ## Trouble Shooting
 ### For Mac Users
