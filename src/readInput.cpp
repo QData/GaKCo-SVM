@@ -8,82 +8,70 @@
 #include <string.h>
 #include <omp.h>
 
-
-int *string_replace (char *s, char *d);
+int * string_replace (char *s, char *d);
 int help2();
-char *readDict (char *filename, int *na);
-
+char * readDict (char *filename, int *na);
 int dictsize;
 
-//read input from fasta file
 
-int ** Readinput_(char *filename, char *dictfile, int *Labelout, int *len, long int *nStr, long int *maxlen, long int *minlen, int *na, int max_num_str) {
+int ** Readinput_(char *filename, char *dictFileName, int *seqLabels, int *seqLengths, long int *nStr, long int *maxlen, long int *minlen, int *dictionarySize, int maxNumStr) {
     int **output;
     char *labelfile, *seqfile;
-    char *str, *linetemp, *line,*seq,*trimline,*label;
-    int i, j;
+    char *str, *linetemp, *line, *seq, *trimline, *label;
+    bool isLabel = true;
     FILE *inpfile;
     char *d;
-    int c = 0;
-    d = readDict(dictfile, na);
+    d = readDict(dictFileName, dictionarySize);
 
     printf("Reading %s\n", filename);
     inpfile = fopen(filename, "r");
-
-    i = 0;
+    
     if (inpfile) {
         line = (char *) malloc(STRMAXLEN * sizeof(char));
-        int row=0;
-        output =  (int **) malloc(STRMAXLEN * sizeof(int *));
-        bool read = true;
+        int row = 0; //counts rows of the output and line number of the sequence file
+        output =  (int **) malloc(maxNumStr * sizeof(int *));
 
-        while (read) {
-            if(!fgets(line, max_num_str, inpfile )) {
-                read = false;
-            }
-
-            linetemp = (char *) malloc(max_num_str * sizeof(char *));
-            strcpy(linetemp,line);
-
-            if (i == 0) {
-                label=strtok(linetemp,">");
-                if(strcmp(label,"0\n")==0) {
-                    strcpy(label,"-1\n");
+        while (fgets(line, STRMAXLEN, inpfile)) {
+            linetemp = (char *) malloc(STRMAXLEN * sizeof(char *));
+            strcpy(linetemp, line);
+            if (isLabel) {
+                label = strtok(linetemp,">");
+                if(strcmp(label, "0\n") == 0) {
+                    strcpy(label, "-1\n");
                 }
-                Labelout[row]= atoi(label);
-                i++;
+                seqLabels[row]= atoi(label);
+                isLabel = false;
             } else {
                 trimline = trimwhitespace(line);
                 strcpy(linetemp, trimline);
-                len[row] = strlen(linetemp);
-                if (len[row] > maxlen[0]) {
-                    maxlen[0] = len[row];
+                seqLengths[row] = strlen(linetemp);
+                if (seqLengths[row] > maxlen[0]) {
+                    maxlen[0] = seqLengths[row];
                 }
-                if (len[row]<minlen[0]) {
-                    minlen[0] = len[row];
+                if (seqLengths[row] < minlen[0]) {
+                    minlen[0] = seqLengths[row];
                 }
-
-                output[row] = (int *)malloc(len[i] * sizeof(int));
-                memset(output[row], 0, sizeof(int) * len[i]);
+                output[row] = (int *) malloc(seqLengths[row] * sizeof(int));
+                memset(output[row], 0, sizeof(int) * seqLengths[row]);
                 strcpy(linetemp, trimline);
                 seq = trimline;
-                output[row] = string_replace(seq,d);
+                output[row] = string_replace(seq, d);
                 row++;
-                i = 0;
+                isLabel = true;
             }
-
             free(linetemp);
         }
         nStr[0] = row;
         fclose(inpfile);
         free(line);
     } else {
-        perror( filename );
+        perror(filename);
     }
+
     for (int kk = 0; kk < *nStr; kk++) {
-        for(int jj=0; jj < len[kk]; jj++) {
+        for(int jj = 0; jj < seqLengths[kk]; jj++) {
             if(output[kk][jj] > dictsize) {
-                output[kk][jj]=0;
+                output[kk][jj] = 0;
             }
         }
     }
@@ -92,46 +80,46 @@ int ** Readinput_(char *filename, char *dictfile, int *Labelout, int *len, long 
 
 // read dictionary to convert into numerical format
 
-char *readDict (char *filename,int *na) {
+char * readDict (char *dictFileName, int *dictionarySize) {
     char *D;
     char *linetemp1, *line1, *next_elem, *trimline;
     int i, j;
     FILE *inpfile;
 
-    inpfile = fopen ( filename, "r" );
-    D = (char *)malloc(50*sizeof(char));
+    inpfile = fopen (dictFileName, "r" );
+    D = (char *) malloc(50 * sizeof(char));
 
     if (inpfile) {
-        line1 = (char *)malloc(STRMAXLEN*sizeof(char));
+        line1 = (char *) malloc(STRMAXLEN * sizeof(char));
         i = 0;
         while (fgets(line1, STRMAXLEN, inpfile)) {
-            linetemp1 = (char *)malloc(STRMAXLEN*sizeof(char));
-            trimline=trimwhitespace(line1);
+            linetemp1 = (char *) malloc(STRMAXLEN * sizeof(char));
+            trimline = trimwhitespace(line1);
             strcpy(linetemp1, trimline);
-            D[i]=linetemp1[0];
+            D[i] = linetemp1[0];
             free(linetemp1);
-            i++;;
+            i++;
         }
-        dictsize=i-1;
-        printf("Dictionary size=%d (+1 for uknown character)\n",dictsize+1);
+        dictsize = i - 1;
+        printf("Dictionary size = %d (+1 for uknown character)\n", dictsize + 1);
         fclose(inpfile);
-        *na = dictsize+2;
+        *dictionarySize = dictsize + 2;
     } else {
-        perror(filename);
+        perror(dictFileName);
     }
     return D;
 }
 
 //converts g-mers into numerical representation
 
-int* string_replace (char *s, char *d) {
+int * string_replace (char *s, char *d) {
     int i, count, found;
     int *array;
     found = 0;
-    array = (int *)malloc(STRMAXLEN*sizeof(int));
+    array = (int *) malloc(STRMAXLEN*sizeof(int));
     count = 0;
     while(s[count] != '\0') {
-        for (i=0; i <= dictsize; i++) {
+        for (i = 0; i <= dictsize; i++) {
             if (toupper(s[count]) == d[i]) {
                 array[count]=i+1;
                 found=1;

@@ -25,22 +25,18 @@
 #include <unistd.h>
 
 //extract g-mers from input sequences
-Features *extractFeatures(int **S, int *len, int nStr, int g)
-{
+Features *extractFeatures(int **S, int *len, int nStr, int g) {
 	int i, j, j1;
 	int n, sumLen, nfeat, addr;
 	int *group;
 	int *features;
-
 	int *s;
 	int c;
 	Features *F;
 
 	nfeat = 0;
 	sumLen = 0;
-
-	for (i = 0; i < nStr; ++i)
-	{
+	for (i = 0; i < nStr; ++i) {
 		sumLen += len[i];
 		nfeat += (len[i] >= g) ? (len[i] - g + 1) : 0;
 	}
@@ -48,29 +44,21 @@ Features *extractFeatures(int **S, int *len, int nStr, int g)
 	printf("numF=%d, sumLen=%d\n", nfeat, sumLen); 
 	group = (int *)malloc(nfeat * sizeof(int));
 	features = (int *)malloc(nfeat*g * sizeof(int *));
-
 	c = 0;
 
-	for (i = 0; i < nStr; ++i)
-	{
+	for (i = 0; i < nStr; ++i) {
 		s = S[i];
-
-
-
-		for (j = 0; j < len[i] - g + 1; ++j)
-		{
-
-			for (j1 = 0; j1 <g; ++j1)
-			{
+		for (j = 0; j < len[i] - g + 1; ++j) {
+			for (j1 = 0; j1 <g; ++j1) {
 				features[c + j1*nfeat] = s[j + j1];
-				
 			}
 			group[c] = i;
 			c++;
 		}
 	}
-	if (nfeat != c)
+	if (nfeat != c) {
 		printf("Something is wrong...\n");
+	}
 
 	F = (Features *)malloc(sizeof(Features));
 	(*F).features = features;
@@ -80,8 +68,7 @@ Features *extractFeatures(int **S, int *len, int nStr, int g)
 }
 
 
-int help()
-{
+int help() {
 	printf("\nUsage: gakco [options] <sequenceFile> <dictionaryFile> <labelsFile> <kernelFile>\n");
 	printf("\t g : length of gapped instance. Constraints: 0 < g < 20\n");
 	printf("\t k : length of k-mer. Constraints: k < g\n");
@@ -100,16 +87,14 @@ int help()
 	return 1;
 }
 
-int errorID1()
-{
+int errorID1() {
 	printf("Error: g >= Shortest sequence in the input file!\n");
 	return 1;
 }
 
 // Build cumulative mismatch profile for each M
 
-void main_loop_kernel(int * elems,Features * features ,unsigned int *Ksfinal,int * cnt_k,   int *feat,int g, int k, int na,int nfeat,int nStr,int i)
-{
+void main_loop_kernel(int * elems,Features * features ,unsigned int *Ksfinal,int * cnt_k,   int *feat,int g, int k, int dictionarySize, int nfeat,int nStr,int i) {
 	unsigned long int c = 0;
 	int num_comb;
 	Combinations * combinations = (Combinations *)malloc(sizeof(Combinations));
@@ -145,7 +130,7 @@ void main_loop_kernel(int * elems,Features * features ,unsigned int *Ksfinal,int
 			}
 		}
 		//sort the g-mers
-		cntsrtna(sortIdx,feat1, g - i, nfeat, na);    
+		cntsrtna(sortIdx,feat1, g - i, nfeat, dictionarySize);    
 
 		for ( int j1 = 0; j1 < nfeat; ++j1) {
 			for ( int j2 = 0; j2 < g - i; ++j2) {
@@ -187,7 +172,7 @@ int main(int argc, char *argv[]) {
 	int g = -1;
 	int k = -1;
 	int parallel_ = 1; //use multithreading by default
-	long int max_num_str = 15000; //Use max string length of 15000 by default
+	long int maxNumStr = 15000; //Use max string length of 15000 by default
 
 	int c;
 	while ((c = getopt(argc, argv, "g:k:n:p:")) != -1) {
@@ -199,7 +184,7 @@ int main(int argc, char *argv[]) {
 				k = atoi(optarg);
 				break;
 			case 'n':
-				max_num_str = atoi(optarg);
+				maxNumStr = atoi(optarg);
 				break;
 			case 'p':
 				parallel_ = atoi(optarg);
@@ -225,20 +210,20 @@ int main(int argc, char *argv[]) {
 	}
 
 	//Get the names of the sequenceFile, dictionaryFile, labelsFile, and kernelFile from the command line
-	char filename[100], filename_label[100], Dicfilename[100], opfilename[100];
+	char filename[100], filename_label[100], dictFileName[100], opfilename[100];
 	strcpy(filename, argv[argNum++]);
-	strcpy(Dicfilename, argv[argNum++]);
+	strcpy(dictFileName, argv[argNum++]);
 	strcpy(filename_label, argv[argNum++]);
 	strcpy(opfilename, argv[argNum]);
 
-	int *label;
-	int num_max_mismatches, na;
+	int *seqLabels;
+	int num_max_mismatches, dictionarySize;
 	unsigned int addr;
 	long int num_comb, value;
 	int nfeat;
 	double *K;
 	unsigned int *nchoosekmat, *Ks, *Ksfinal, *Ksfinalmat;
-	int *len;
+	int *seqLengths;
 	int **S;
 	unsigned int *sortIdx;
 	int *feat;
@@ -251,19 +236,19 @@ int main(int argc, char *argv[]) {
 	
 	isVerbose = 0;
 	
-	label = (int *)malloc(STRMAXLEN*sizeof(int));
-	len = (int *)malloc(STRMAXLEN * sizeof(int));
-	assert(len != 0);  
+	seqLabels = (int *) malloc(maxNumStr * sizeof(int));
+	seqLengths = (int *) malloc(maxNumStr * sizeof(int));
+	assert(seqLengths != 0);  
 	maxlen = 0;
-	minlen = max_num_str;
-	long int nStr = max_num_str;
+	minlen = STRMAXLEN;
+	long int nStr = maxNumStr;
 	
 	//Read the sequence file
 	
 	printf("Input file : %s\n", filename);
-	S = Readinput_(filename, Dicfilename, label, len, &nStr, &maxlen, &minlen, &na, max_num_str);
+	S = Readinput_(filename, dictFileName, seqLabels, seqLengths, &nStr, &maxlen, &minlen, &dictionarySize, maxNumStr);
 	
-	if (k <= 0 || g <= k || g > 20 || g - k > 20 || na <= 0) {
+	if (k <= 0 || g <= k || g > 20 || g - k > 20 || dictionarySize <= 0) {
 		return help();
 	}
 	if (maxlen != minlen) {
@@ -287,7 +272,7 @@ int main(int argc, char *argv[]) {
 	printf("\n");
 
 	/*Extract g-mers.*/
-	features = extractFeatures(S, len, nStr, g);
+	features = extractFeatures(S, seqLengths, nStr, g);
 	
 	nfeat = (*features).n;
 	feat = (*features).features;
@@ -296,15 +281,15 @@ int main(int argc, char *argv[]) {
 	/*Compute gapped kernel.*/
 	K = (double *)malloc(nStr*nStr * sizeof(double));
 
-	addr = ((g - k) + 1)*nStr*nStr;
+	addr = ((g - k) + 1) * nStr * nStr;
 
 	Ksfinal = (unsigned int *)malloc(addr * sizeof(unsigned int));
 	
 	memset(Ksfinal, 0, sizeof(unsigned int) * addr);
 		
-	elems = (int *)malloc(g * sizeof(int));
+	elems = (int *) malloc(g * sizeof(int));
 
-	cnt_k = (int *)malloc(nfeat * sizeof(int));
+	cnt_k = (int *) malloc(nfeat * sizeof(int));
 	for (int i = 0; i < g; ++i) {
 		elems[i] = i;
 	}
@@ -312,9 +297,9 @@ int main(int argc, char *argv[]) {
 	std::vector<std::thread> th;
 	for ( int i = 0 ; i <= g-k; i++) {
 		if(parallel_) {
-			th.push_back(std::thread(&main_loop_kernel,elems,features ,Ksfinal,cnt_k,feat,g, k, na,nfeat,nStr,i));
+			th.push_back(std::thread(&main_loop_kernel,elems,features ,Ksfinal,cnt_k,feat,g, k, dictionarySize, nfeat,nStr,i));
 		} else {
-			main_loop_kernel(elems,features ,Ksfinal,cnt_k,feat,g, k, na,nfeat,nStr,i);
+			main_loop_kernel(elems,features, Ksfinal, cnt_k, feat, g, k, dictionarySize, nfeat, nStr, i);
 		}
 	}
 	
@@ -365,11 +350,11 @@ int main(int argc, char *argv[]) {
 	kernelfile = fopen(opfilename, "w");
 	labelfile = fopen(filename_label, "w");
 
-	for (int i = 0; i < nStr; ++i) {	
+	for (int i = 0; i < nStr; ++i) {
 		for (int j = 0; j < nStr; ++j) {
 			fprintf(kernelfile, "%d:%e ", j + 1, K[i + j*nStr] / sqrt(K[i + i*nStr] * K[j + j*nStr]));
 		}
-		fprintf(labelfile, "%d ", label[i]);
+		fprintf(labelfile, "%d ", seqLabels[i]);
 		fprintf(labelfile, "\n");
 		fprintf(kernelfile, "\n");
 	}
@@ -378,7 +363,7 @@ int main(int argc, char *argv[]) {
 	fclose(labelfile);
 	free(cnt_k);
 	free(Ksfinal);
-	free(label);
+	free(seqLabels);
 	free(K);
 	free(nchoosekmat);
 	free(feat);
