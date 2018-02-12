@@ -39,7 +39,7 @@ Or:
 ```
     $ ./bin/GaKCo -g 7 -k 5 -n 15000 -p 1 mySequences.fasta data/protein.dictionary.txt labelsFile.txt computedKernel.txt
 ```
-## Output
+#### Output
 GaKCo computes the kernel function for all pairs of sequences in the provided sequence file, thus giving the "distance" or "similarity" values needed for an SVM classifier. The file will be found in your `GaKCo` directory.
 
 ### Running GaKCo with the RUN.sh script
@@ -57,7 +57,7 @@ Alternatively, you can simply use the following to call the RUN.sh script with d
 ```
 You can change the default values by opening RUN.sh and changing the file names (located on lines 8, 9, 10). You can change the default parameter values by modifying lines 32-35.
 
-## Output
+#### Output
 The script places the computed test and kernel files in the `GaKCo-SVM/results` directory.
 
 ## Trouble Shooting
