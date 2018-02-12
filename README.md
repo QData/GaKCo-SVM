@@ -29,16 +29,20 @@ GaKCo takes several arguments:
             p : (optional) parallel. Set to 1 to using multithreading; else set to 0. Default: 1
             sequenceFile : set of training and testing examples in FASTA format
             dictionaryFile : file containing the alphabet of characters that appear in the sequences (simple text file)
-            labelsFile : file to place labels from the examples (simple text file)
-            kernelFile : name of the file to write the kernel that will be computed by GaKCo
+            labelsFile : name of file to place labels from the examples (simple text file). This file is used by GaKCo to create create the kernel matrix
+            kernelFile : name of the file to write the kernel that will be computed by GaKCo.
 For example:
 ```
     $ ./GaKCo -g 7 -k 5 -n 15000 -p 1 mySequences.fasta data/protein.dictionary.txt labelsFile.txt computedKernel.txt
 ```
+Or:
+```
+    $ ./bin/GaKCo -g 7 -k 5 -n 15000 -p 1 mySequences.fasta data/protein.dictionary.txt labelsFile.txt computedKernel.txt
+```
 This would use the input files to compute a kernel matrix (stored in computedKernel.txt) that can be inputted to an SVM classifier.
 
 ### Running GaKCo with the RUN.sh script
-You can run GaKCo using the `RUN.sh` script:
+You can run GaKCo using the `RUN.sh` script after completing the "Installation" instructions above:
 ```
     $ bash RUN.sh <trainingFile.fasta> <testingFile.fasta> <dictionaryFile.txt>
 ```
