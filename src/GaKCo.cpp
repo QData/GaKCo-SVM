@@ -15,7 +15,6 @@
 #include "shared.h"
 #include "shared.cpp"
 #include <assert.h>
-#include <omp.h>
 #include <thread>
 #include <iostream>
 #include <random>
