@@ -348,10 +348,13 @@ int main(int argc, char *argv[]) {
 	FILE *labelfile;
 	kernelfile = fopen(opfilename, "w");
 	labelfile = fopen(filename_label, "w");
+	float kernel_val;
 
 	for (int i = 0; i < nStr; ++i) {
 		for (int j = 0; j < nStr; ++j) {
-			fprintf(kernelfile, "%d:%e ", j + 1, K[i + j*nStr] / sqrt(K[i + i*nStr] * K[j + j*nStr]));
+			kernel_val = K[i + j*nStr] / sqrt(K[i + i*nStr] * K[j + j*nStr]);
+			if (kernel_val < 1e-50) kernel_val = 0.0;
+			fprintf(kernelfile, "%d:%e ", j + 1, kernel_val);
 		}
 		fprintf(labelfile, "%d ", seqLabels[i]);
 		fprintf(labelfile, "\n");
