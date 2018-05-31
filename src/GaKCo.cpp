@@ -73,7 +73,10 @@ int help() {
 	printf("\t k : length of k-mer. Constraints: k < g\n");
 	printf("\t n : (optional) maximum number of examples in the data set. Default: 15000\n");
 	printf("\t p : (optional) parallel. Set to 1 to using multithreading; else set to 0. Default: 1\n");
-	printf("\t sequenceFile : set of training and testing examples in FASTA format\n");
+	printf("\t sequenceFile : set of sequences. Format must be as follows:\n");
+	printf("\t\t>label\n\t\tsequence\n\t\tetc.\n");
+	printf("\t\tWhere the label is a class label (-1 or 0 for negative sequences, 1 for positive sequences).\n");
+	printf("\t\tSequences must be contained in a single line. See \"Sequence File Format\" section of readme for more details.\n");
 	printf("\t dictionaryFile : file containing the alphabet of characters that appear in the sequences (simple text file)\n");
 	printf("\t labelsFile : file to place labels from the examples (simple text file)\n");
 	printf("\t kernelFile : name of the file to write the kernel that will be computed by GaKCo\n");
