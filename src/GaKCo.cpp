@@ -1,9 +1,9 @@
 // GaKCo : Fast Gapped k-mer string Kernel using Counting
 // Code Contibution by:
 //Ritambhara Singh <rs3zz@virginia.edu>
-//Kamran Kowsari <kk7nc@virginia.edu >
-//Arshdeep Sekhon <as5cu@virginia.edu >
-
+//Kamran Kowsari <kk7nc@virginia.edu>
+//Arshdeep Sekhon <as5cu@virginia.edu>
+//Derrick Blakely <dcb7xz@virginia.edu>
 
 // This file contains Main Code
 
@@ -107,8 +107,8 @@ void main_loop_kernel(int * elems,Features * features ,unsigned int *Ksfinal,int
 	unsigned int *cnt_comb = (unsigned int *)malloc(2 * sizeof(unsigned int));
 	unsigned int *feat1 = (unsigned int *)malloc(nfeat*g * sizeof(unsigned int));
 	
-	int *pos = (int *)malloc(nfeat * sizeof(int));
-	memset(pos, 0, sizeof(int) * nfeat);
+	int *pos = (int *)malloc(g * sizeof(int));
+	memset(pos, 0, sizeof(int) * g);
 	c = i*(nStr*nStr);
 	(*combinations).n = g;
 	(*combinations).k = g - i;
@@ -167,7 +167,9 @@ void main_loop_kernel(int * elems,Features * features ,unsigned int *Ksfinal,int
 }
 
 //Main function 
-
+//Kernel inconsistency seems to depend on both g and k
+//So nfeat seems to matter, as does k and num_max_mismatches
+//Check arrays that depend on these to see if something weird is happening somewhere
 int main(int argc, char *argv[]) {
 
 	//Get the g, k, nStr, and parallel_ values from the command line 
@@ -291,7 +293,7 @@ int main(int argc, char *argv[]) {
 		
 	elems = (int *) malloc(g * sizeof(int));
 
-	cnt_k = (int *) malloc(nfeat * sizeof(int));
+	cnt_k = (int *) malloc((g - k + 1) * sizeof(int));
 	for (int i = 0; i < g; ++i) {
 		elems[i] = i;
 	}
@@ -342,7 +344,7 @@ int main(int argc, char *argv[]) {
 		c1 = cnt_k[i];
 		for ( int j1 = 0; j1 < nStr; ++j1) {
 			for ( int j2 = 0; j2 < nStr; ++j2) {
-				K[j1 + j2*nStr] += w[i] * Ksfinal[(c1 + j1) + j2*nStr];
+				K[j1 + j2 * nStr] += w[i] * Ksfinal[(c1 + j1) + j2*nStr];
 			}
 		}
 	}
