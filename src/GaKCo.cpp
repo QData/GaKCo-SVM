@@ -26,7 +26,7 @@
 //extract g-mers from input sequences
 Features *extractFeatures(int **S, int *len, int nStr, int g) {
 	int i, j, j1;
-	int n, sumLen, nfeat, addr;
+	int n, nfeat, addr;
 	int *group;
 	int *features;
 	int *s;
@@ -34,13 +34,11 @@ Features *extractFeatures(int **S, int *len, int nStr, int g) {
 	Features *F;
 
 	nfeat = 0;
-	sumLen = 0;
 	for (i = 0; i < nStr; ++i) {
-		sumLen += len[i];
 		nfeat += (len[i] >= g) ? (len[i] - g + 1) : 0;
 	}
 
-	printf("numF=%d, sumLen=%d\n", nfeat, sumLen); 
+	printf("Number of gmers: %d\n", nfeat); 
 	group = (int *)malloc(nfeat * sizeof(int));
 	features = (int *)malloc(nfeat*g * sizeof(int *));
 	c = 0;
@@ -48,7 +46,7 @@ Features *extractFeatures(int **S, int *len, int nStr, int g) {
 	for (i = 0; i < nStr; ++i) {
 		s = S[i];
 		for (j = 0; j < len[i] - g + 1; ++j) {
-			for (j1 = 0; j1 <g; ++j1) {
+			for (j1 = 0; j1 < g; ++j1) {
 				features[c + j1*nfeat] = s[j + j1];
 			}
 			group[c] = i;
@@ -96,7 +94,7 @@ int errorID1() {
 
 // Build cumulative mismatch profile for each M
 
-void main_loop_kernel(int * elems,Features * features ,unsigned int *Ksfinal,int * cnt_k,   int *feat,int g, int k, int dictionarySize, int nfeat,int nStr,int i) {
+void main_loop_kernel(int * elems,Features * features ,unsigned int *Ksfinal,int * cnt_k,   int *feat,int g, int dictionarySize, int nfeat,int nStr,int i) {
 	unsigned long int c = 0;
 	int num_comb;
 	Combinations * combinations = (Combinations *)malloc(sizeof(Combinations));
@@ -109,15 +107,17 @@ void main_loop_kernel(int * elems,Features * features ,unsigned int *Ksfinal,int
 	
 	int *pos = (int *)malloc(g * sizeof(int));
 	memset(pos, 0, sizeof(int) * g);
+
 	c = i*(nStr*nStr);
 	(*combinations).n = g;
 	(*combinations).k = g - i;
+	int k = g - i;
 
-	(*combinations).num_comb = nchoosek(g, g - i);
+	(*combinations).num_comb = nchoosek(g, k);
 
 	// number of possible positions
-	num_comb = nchoosek(g, g - i);
-	unsigned int  *out = (unsigned int *)malloc((g - i)*num_comb * sizeof(unsigned int));
+	num_comb = nchoosek(g, k);
+	unsigned int  *out = (unsigned int *)malloc(k*num_comb * sizeof(unsigned int));
 	unsigned int  *cnt_m = (unsigned int *)malloc(g * sizeof(unsigned int));
 	cnt_comb[0] = 0;
 	getCombinations(elems,(*combinations).n, (*combinations).k, pos, 0, 0, cnt_comb, out, num_comb);
@@ -125,30 +125,31 @@ void main_loop_kernel(int * elems,Features * features ,unsigned int *Ksfinal,int
 
 	cnt_comb[0] += ((*combinations).k*num_comb);
 	for ( int j = 0; j < num_comb; ++j) {
-		//remove i positions
+		//remove i positions 
 		for ( int j1 = 0; j1 < nfeat; ++j1) {
-			for ( int j2 = 0; j2 < g - i; ++j2) {
-				feat1[j1 + j2*nfeat] = feat[j1 + (out[(cnt_m[i] - num_comb + j) + j2*num_comb])*nfeat];
+			for ( int j2 = 0; j2 < k; ++j2) {
+				unsigned int out_val = out[(cnt_m[i] - num_comb + j) + j2*num_comb];
+				feat1[j1 + j2*nfeat] = feat[j1 + out_val*nfeat];
 			}
 		}
 		//sort the g-mers
-		cntsrtna(sortIdx,feat1, g - i, nfeat, dictionarySize);    
+		cntsrtna(sortIdx,feat1, k, nfeat, dictionarySize);    
 
 		for ( int j1 = 0; j1 < nfeat; ++j1) {
-			for ( int j2 = 0; j2 < g - i; ++j2) {
+			for ( int j2 = 0; j2 < k; ++j2) {
 				features_srt[j1 + j2*nfeat] = feat1[(sortIdx[j1]) + j2*nfeat];
 			}
 			group_srt[j1] = (*features).group[sortIdx[j1]];
 		}
 		//update cumulative mismatch profile
-		countAndUpdate(Ks, features_srt, group_srt, g - i, nfeat, nStr);
+		countAndUpdate(Ks, features_srt, group_srt, k, nfeat, nStr);
 		
 		for ( int j1 = 0; j1 < nStr; ++j1) {
 			for ( int j2 = j1; j2 < nStr; ++j2) {
-				if(j1!=j2) {
+				if (j1 != j2) {
 					Ksfinal[(c + j1) + j2*nStr] += Ks[j1 + j2*nStr];
 				}
-				Ksfinal[c +(j1)*nStr + j2] += Ks[j1 + j2*nStr];
+				Ksfinal[c + j1*nStr + j2] += Ks[j1 + j2*nStr];
 			}
 		}
 	}
@@ -156,7 +157,7 @@ void main_loop_kernel(int * elems,Features * features ,unsigned int *Ksfinal,int
 	free(cnt_m);
 	free(out);
 	cnt_k[i] = c;
-	printf("iter:%d\n", i); 
+	printf("Finished handling mismatch level of m = %d\n", i); 
 	free(Ks);
 	free(sortIdx);
 	free(features_srt);
@@ -167,11 +168,7 @@ void main_loop_kernel(int * elems,Features * features ,unsigned int *Ksfinal,int
 }
 
 //Main function 
-//Kernel inconsistency seems to depend on both g and k
-//So nfeat seems to matter, as does k and num_max_mismatches
-//Check arrays that depend on these to see if something weird is happening somewhere
 int main(int argc, char *argv[]) {
-
 	//Get the g, k, nStr, and parallel_ values from the command line 
 	int g = -1;
 	int k = -1;
@@ -223,7 +220,7 @@ int main(int argc, char *argv[]) {
 	int *seqLabels;
 	int num_max_mismatches, dictionarySize;
 	unsigned int addr;
-	long int num_comb, value;
+	long int num_comb;
 	int nfeat;
 	double *K;
 	unsigned int *nchoosekmat, *Ks, *Ksfinal, *Ksfinalmat;
@@ -264,26 +261,23 @@ int main(int argc, char *argv[]) {
 		return errorID1();
 	}
 
-	/* Precompute weights hm.*/
+	num_max_mismatches = g - k;
 
-	int w[g - k];
-	printf("Weights (hm):");
-	for (int i = 0; i <= g - k; i++) {
+	/* Precompute weights hm.*/
+	int w[g - k + 1];
+	for (int i = 0; i <= num_max_mismatches; i++) {
 		w[i] = nchoosek(g - i, k);
-		printf("%d ", w[i]);
 	}
-	
-	printf("\n");
 
 	/*Extract g-mers.*/
 	features = extractFeatures(S, seqLengths, nStr, g);
 	
 	nfeat = (*features).n;
 	feat = (*features).features;
-	printf("(%d,%d): %d features\n", g, k, nfeat); 
 
 	/*Compute gapped kernel.*/
 	K = (double *)malloc(nStr*nStr * sizeof(double));
+	memset(K, 0, sizeof(double *) * nStr * nStr);
 
 	addr = ((g - k) + 1) * nStr * nStr;
 
@@ -301,9 +295,9 @@ int main(int argc, char *argv[]) {
 	std::vector<std::thread> th;
 	for ( int i = 0 ; i <= g-k; i++) {
 		if(parallel_) {
-			th.push_back(std::thread(&main_loop_kernel,elems,features ,Ksfinal,cnt_k,feat,g, k, dictionarySize, nfeat,nStr,i));
+			th.push_back(std::thread(&main_loop_kernel,elems,features ,Ksfinal,cnt_k,feat,g, dictionarySize, nfeat,nStr,i));
 		} else {
-			main_loop_kernel(elems,features, Ksfinal, cnt_k, feat, g, k, dictionarySize, nfeat, nStr, i);
+			main_loop_kernel(elems,features, Ksfinal, cnt_k, feat, g, dictionarySize, nfeat, nStr, i);
 		}
 	}
 	
@@ -316,9 +310,8 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	int c1 = 0,
-	c2 = 0;
-	num_max_mismatches = g - k;
+	int c1 = 0;
+	int c2 = 0;
 
 	//join parallel threads
 	if(parallel_) {
@@ -332,15 +325,13 @@ int main(int argc, char *argv[]) {
 		for ( int j = 0; j <= i - 1; ++j) {
 			c2 = cnt_k[j];
 			for ( int j1 = 0; j1 < nStr; ++j1) {
-				value = 0;
-				int x = 0;
 				for ( int j2 = 0; j2 < nStr; ++j2) {
 					Ksfinal[(c1 + j1) + j2*nStr] -=  nchoosekmat[(g - j - 1) + (i - j - 1)*g] * Ksfinal[(c2 + j1) + j2*nStr];
 				}
 			}
 		}
 	}
-	for ( int i = 0; i <= g - k; i++) {
+	for ( int i = 0; i <= num_max_mismatches; i++) {
 		c1 = cnt_k[i];
 		for ( int j1 = 0; j1 < nStr; ++j1) {
 			for ( int j2 = 0; j2 < nStr; ++j2) {
@@ -349,6 +340,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	/*Normalize kernel values and write into a file*/
+	printf("Writing kernel matrix to %s...\n", opfilename);
 	FILE *kernelfile;
 	FILE *labelfile;
 	kernelfile = fopen(opfilename, "w");
@@ -365,6 +357,7 @@ int main(int argc, char *argv[]) {
 		fprintf(labelfile, "\n");
 		fprintf(kernelfile, "\n");
 	}
+	printf("Done\n");
 		
 	fclose(kernelfile);
 	fclose(labelfile);
