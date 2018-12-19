@@ -3,6 +3,24 @@
 GaKCo is a fast and naturally parallelizable algorithm for gapped k-mer based string kernel calculation. GaKCo uses associative arrays to calculate the co-occurrence of substrings using cumulative counting. The algorithm easily scales to large dictionary sizes and high numbers of mismatches.
 ### Reference Paper
 Link: [GaKCo: a Fast GApped k-mer string Kernel using COunting](https://arxiv.org/abs/1704.07468)
+
+### Citations
+
+```
+@inproceedings{singh_gakco:_2017,
+    location = {Cham},
+    title = {{GaKCo}: A Fast Gapped k-mer String Kernel Using Counting},
+    isbn = {978-3-319-71249-9},
+    abstract = {String Kernel ({SK}) techniques, especially those using gapped k-mers as features (gk), have obtained great success in classifying sequences like {DNA}, protein, and text. However, the state-of-the-art gk-{SK} runs extremely slow when we increase the dictionary size (\$\${\textbackslash}{backslashvarSigma} \$\$) or allow more mismatches (M). This is because current gk-{SK} uses a trie-based algorithm to calculate co-occurrence of mismatched substrings resulting in a time cost proportional to \$\$O({\textbackslash}{backslashvarSigma} {\textasciicircum}\{M\})\$\$. We propose a fast algorithm for calculating Gapped k-mer Kernel using Counting ({GaKCo}). {GaKCo} uses associative arrays to calculate the co-occurrence of substrings using cumulative counting. This algorithm is fast, scalable to larger \$\${\textbackslash}{backslashvarSigma} \$\$and M, and naturally parallelizable. We provide a rigorous asymptotic analysis that compares {GaKCo} with the state-of-the-art gk-{SK}. Theoretically, the time cost of {GaKCo} is independent of the \$\${\textbackslash}{backslashvarSigma} {\textasciicircum}\{M\}\$\$term that slows down the trie-based approach. Experimentally, we observe that {GaKCo} achieves the same accuracy as the state-of-the-art and outperforms its speed by factors of 2, 100, and 4, on classifying sequences of {DNA} (5 datasets), protein (12 datasets), and character-based English text (2 datasets). ({GaKCo} is shared as an open source tool at https://github.com/{QData}/{GaKCo}-{SVM}). Code and data related to this chapter are available at: https://doi.org/10.6084/m9.figshare.5434825.},
+    pages = {356--373},
+    booktitle = {Machine Learning and Knowledge Discovery in Databases},
+    publisher = {Springer International Publishing},
+    author = {Singh, Ritambhara and Sekhon, Arshdeep and Kowsari, Kamran and Lanchantin, Jack and Wang, Beilun and Qi, Yanjun},
+    editor = {Ceci, Michelangelo and Hollmén, Jaakko and Todorovski, Ljupčo and Vens, Celine and Džeroski, Sašo},
+    date = {2017}
+}
+```
+
 ### Included Datasets
 We perform 19 different classification tasks to evaluate the performance of GaKCo. The tasks pertain to three categories:
 
